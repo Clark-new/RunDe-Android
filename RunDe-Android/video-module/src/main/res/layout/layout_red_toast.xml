@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/red_toast_bg"
+    android:paddingStart="50dp"
+    android:paddingTop="13dp"
+    android:id="@+id/id_toast_txt"
+    android:paddingEnd="50dp"
+    android:paddingBottom="13dp"
+    android:text="连麦已中断"
+    android:textColor="#ffffffff"
+    android:textSize="16sp" />
+

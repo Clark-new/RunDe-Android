@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/id_back"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="7dp"
+        android:src="@drawable/back" />
+
+    <LinearLayout
+        android:id="@+id/id_other_control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="9dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/id_share"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/live_share" />
+
+        <ImageView
+            android:id="@+id/id_switch_screen"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/live_switchscreen" />
+
+        <ImageView
+            android:id="@+id/id_apply_rtc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/live_put_up_hands"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+
+    <!-- android:background="@drawable/bottom_control_bg"-->
+    <FrameLayout
+        android:id="@+id/id_bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:background="#9E050001"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/id_play_s"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="13dp"
+                android:src="@drawable/play_btn_bg_s" />
+
+            <TextView
+                android:id="@+id/id_curr_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="00:00"
+                android:textColor="#ffd8d8d8"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/id_total_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textColor="#ffd8d8d8"
+                android:textSize="12sp"
+                tools:text="/ 00:00" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/id_danmu_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="5dp"
+                android:text="弹幕"
+                android:textColor="#ffd8d8d8"
+                android:textSize="13sp" />
+
+            <com.bokecc.video.widget.SwitchButton
+                android:id="@+id/id_danmu_btn"
+                android:layout_width="40dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="22dp"
+                app:sb_checked="true"
+                app:sb_checked_color="#ff2196f3"
+                app:sb_checkline_color="@null"
+                app:sb_uncheckcircle_radius="0dp"
+                app:sb_uncheckcircle_width="0dp" />
+
+            <ImageView
+                android:id="@+id/id_full_screen"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="22dp"
+                android:src="@drawable/live_full_screen" />
+
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/id_seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@null"
+            android:max="1000"
+            android:maxHeight="2dp"
+            android:minHeight="2dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:progressDrawable="@drawable/layer_progress_bar"
+            android:thumb="@drawable/selector_seekbar_thumb"
+            android:thumbOffset="0dp" />
+
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/id_bottom_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_gravity="bottom"
+        android:max="1000"
+        android:progressDrawable="@drawable/layer_progress_bar"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/id_loading"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:indeterminateDrawable="@drawable/progress_loading"
+        android:visibility="visible" />
+
+
+    <ImageView
+        android:id="@+id/id_play_b"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:src="@drawable/play_btn_bg"
+        android:visibility="visible" />
+
+</FrameLayout>

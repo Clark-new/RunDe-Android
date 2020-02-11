@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/id_open_course_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff"
+        android:orientation="horizontal"
+        android:paddingStart="15dp">
+
+        <View
+            android:id="@+id/id_float_view_anchor"
+            android:layout_width="0dp"
+            android:layout_height="0dp" />
+
+        <com.bokecc.video.widget.MoveAnimView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/id_teacher_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="王波波老师"
+                android:textColor="#ff333333"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/id_watch_user_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12354人在看"
+                android:textColor="#ff969494"
+                android:textSize="14sp" />
+
+        </com.bokecc.video.widget.MoveAnimView>
+
+        <TextView
+            android:id="@+id/id_send_gift_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/send_gift_bg"
+            android:drawableStart="@drawable/live_gift"
+            android:gravity="center_vertical"
+            android:padding="7dp"
+            android:text="送礼物"
+            android:textColor="#fffe992a"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffdddddd" />
+</LinearLayout>

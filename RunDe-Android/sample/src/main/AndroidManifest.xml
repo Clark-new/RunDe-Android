@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.bokecc.sample">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+
+
+    <application
+        android:extractNativeLibs="true"
+        tools:replace="android:extractNativeLibs"
+        android:name="com.bokecc.sample.DWApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <meta-data android:name="android.notch_support" android:value="false"/>
+
+        <!-- 兼容 Android P -->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <!-- 引导页 -->
+        <activity android:name="com.bokecc.sample.activity.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 导航页 -->
+        <activity
+            android:name="com.bokecc.sample.activity.PilotActivity"
+            android:screenOrientation="portrait" />
+
+        <!-- 直播登录页 -->
+        <activity
+            android:name="com.bokecc.sample.activity.LiveLoginActivity"
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="live"
+                    android:scheme="cclivevc" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- 回放登录页 -->
+        <activity
+            android:name="com.bokecc.sample.activity.ReplayLoginActivity"
+            android:screenOrientation="portrait" />
+
+        <!-- 扫码页面 -->
+        <activity android:name="com.bokecc.sample.scan.qr_codescan.MipcaActivityCapture" />
+        <activity android:name=".TestActivity" />
+
+    </application>
+
+</manifest>

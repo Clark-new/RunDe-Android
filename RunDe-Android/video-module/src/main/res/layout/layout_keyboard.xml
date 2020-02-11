@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/id_effect_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/id_gift_group"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:animateLayoutChanges="true"
+            android:gravity="bottom"
+            android:orientation="vertical" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:id="@+id/id_input_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:background="#ffffff"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_above="@+id/line"
+               >
+                <com.bokecc.video.widget.RadioView
+                    android:id="@+id/id_radio_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="15dp" />
+            </FrameLayout>
+
+            <com.bokecc.video.widget.heart.HeartView
+                android:id="@+id/id_heart_btn"
+                android:layout_marginBottom="2dp"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/line"
+                android:layout_alignParentEnd="true" />
+
+            <View
+                android:id="@+id/line"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_above="@+id/toolbar"
+                android:background="#D2D3D5" />
+
+            <LinearLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="49dp"
+                android:layout_alignParentBottom="true"
+                android:background="#ffffff"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.bokecc.video.widget.MultipleStateImageView
+                    android:id="@+id/id_input_left_btn"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/tool_bar_course" />
+
+                <EditText
+                    android:id="@+id/id_chat_edit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_text_bg_shape"
+                    android:hint="在这里和老师互动哦"
+                    android:imeOptions="actionSend"
+                    android:lines="1"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:singleLine="true"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/id_input_right_btn1"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/tool_bar_gift" />
+
+                <ImageView
+                    android:id="@+id/id_input_right_btn2"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="15dp"
+                    android:src="@drawable/tool_bar_plus" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+        <include
+            android:id="@+id/id_plus_bottom"
+            layout="@layout/layout_plus_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/id_emotion_panel"
+        android:layout_width="match_parent"
+        android:layout_height="207dp"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:id="@+id/id_emotion_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#ffdddddd" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:scaleType="centerInside"
+                android:src="@drawable/input_box_emoji"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#ffeeeeee" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/id_send_btn"
+                android:layout_width="65dp"
+                android:layout_height="50dp"
+                android:background="#ffff454b"
+                android:gravity="center"
+                android:text="发送"
+                android:textColor="#ffffffff"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.bokecc.video.widget.MaxVideoContainer
+        android:id="@+id/id_max_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000" />
+
+
+    <com.bokecc.video.widget.TabPageIndicator
+        android:id="@+id/id_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <include
+        layout="@layout/item_open_course_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.bokecc.video.widget.ViewPagerSlide
+        android:id="@+id/id_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

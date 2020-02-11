@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+apply plugin: 'io.objectbox'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        ndk {
+            abiFilters 'armeabi-v7a','x86'
+        }
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = '1.7'
+        targetCompatibility = '1.7'
+    }
+
+    sourceSets {
+        main{
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha01'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    api files('libs/dwlivesdk.jar')
+    implementation 'com.squareup.okio:okio:2.2.2'
+    api files('libs/okhttp-3.10.0.jar')
+    implementation files('libs/tbs_sdk_thirdapp_v4.3.0.1020.jar')
+    implementation files('libs/libjingle_peerconnection.jar')
+    implementation files('libs/rtc.jar')
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
+    implementation 'com.github.ctiao:ndkbitmap-armv7a:0.9.21'
+    implementation files('libs/org.apache.http.legacy.jar')
+    implementation files('libs/drmlib.jar')
+    implementation files('libs/engine-0.8.3.jar')
+}

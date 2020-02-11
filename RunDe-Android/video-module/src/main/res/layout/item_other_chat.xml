@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/id_item_container"
+    android:layout_marginTop="23dp"
+    android:orientation="horizontal">
+
+    <com.bokecc.video.widget.HeadView
+        android:id="@+id/id_head_img"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="15dp"
+        android:src="@drawable/user_head_icon" />
+
+    <TextView
+        android:layout_marginTop="2dp"
+        android:id="@+id/id_text_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="9dp"
+        android:layout_marginEnd="15dp"
+        android:textColor="#ff999999"
+        android:textSize="14sp" />
+
+</LinearLayout>
