@@ -158,7 +158,6 @@ public class FloatView extends FrameLayout implements View.OnClickListener {
         mDownX = x;
         mDownY = y;
         createActivityFloatLayoutParams();
-
     }
 
 

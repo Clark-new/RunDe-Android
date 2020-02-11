@@ -101,6 +101,7 @@ public class LiveListener implements DWLiveListener {
          * 直播过程中发送过来的时间是绝对时间"19:20:19"，但是历史聊天消息是相对直播开始时间的相对时间
          * 这里为了方便统一计算，我们将绝对时间统一计算成相对时间
          */
+
 //        LiveInfo liveInfo = HDApi.get().getLiveInfo();
 //
 //        if (liveInfo != null) {

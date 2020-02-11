@@ -5,6 +5,7 @@ import android.text.SpannableString;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,6 +76,7 @@ public class ChatFragment extends GiftFragment {
         mAdapter = new MultiItemTypeAdapter<>(getContext(), mShowList);
         mAdapter.addItemViewDelegate(new OtherChatItem());
         mAdapter.addItemViewDelegate(new SelfChatItem());
+        mAdapter.addItemViewDelegate(new EmptyLayout());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -123,6 +125,10 @@ public class ChatFragment extends GiftFragment {
     @Override
     protected void sendMsg(String msg) {
         if ("".equals(msg)) return;
+        if (msg.length() >= 200) {
+            Toast.makeText(getContext(), "文字消息过长", Toast.LENGTH_SHORT).show();
+            return;
+        }
         HDApi.get().sendPublicChatMsg(msg);
     }
 
@@ -159,7 +165,7 @@ public class ChatFragment extends GiftFragment {
 
         @Override
         public boolean isForViewType(ChatMessage msg, int position) {
-
+            if (msg.getStatus().equals("1")) return false;
             if (msg.getUserId() != null && !"".equals(msg.getUserId())) {
                 return !msg.getUserId().equals(mSelfId);
             }
@@ -210,7 +216,6 @@ public class ChatFragment extends GiftFragment {
         }
 
 
-
         @Override
         public boolean isForViewType(ChatMessage message, int position) {
             if (message.getUserId() != null && !"".equals(message.getUserId())) {
@@ -218,7 +223,6 @@ public class ChatFragment extends GiftFragment {
             }
             return false;
         }
-
 
 
         @Override
@@ -239,29 +243,49 @@ public class ChatFragment extends GiftFragment {
                 }
             });
         }
-
-
     }
+
+
+    class EmptyLayout implements ItemViewDelegate<ChatMessage> {
+
+        @Override
+        public int getItemViewLayoutId() {
+            return R.layout.item_empy;
+        }
+
+        @Override
+        public boolean isForViewType(ChatMessage message, int position) {
+            if (message.getUserId() != null && !"".equals(message.getUserId())) {
+                if (message.getUserId().equals(mSelfId)) {
+                    return false;
+                }
+            }
+            if ("1".equals(message.getStatus())) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void convert(ViewHolder holder, ChatMessage message, int position) {
+        }
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onChatMessageStatusChange(StatusChangeMsg changeMsg) {
         ArrayList<String> chatIds = changeMsg.chatIds;
         if (mMessageList != null && mMessageList.size() > 0 && chatIds != null && chatIds.size() > 0) {
-            //后向前遍历，聊天集合数据，找到符合chatIds的chat数据
-            //存入集合中
-            List<ChatMessage> msgList = new LinkedList<>();
             for (String chatId : chatIds) {
                 for (int i = mMessageList.size() - 1; i > 0; --i) {
                     ChatMessage message = mMessageList.get(i);
                     if (chatId.equals(message.getChatId())) {
                         message.setStatus(changeMsg.status);
-                        msgList.add(message);
                         break;
                     }
                 }
             }
-            if (msgList.size() == 0) return;
-            addApprovedDataToUi(msgList);
+            addApprovedDataToUi(chatIds, changeMsg.status);
         }
     }
 
@@ -271,89 +295,33 @@ public class ChatFragment extends GiftFragment {
      *
      * @param msgList msgList
      */
-    private void addApprovedDataToUi(List<ChatMessage> msgList) {
-
-        for (ChatMessage message : msgList) {
-            if (isOnlyShowTeacher
-                    //开始只显示老师，如果角色不是老师，则不显示
-                    && (!TEACHER_ROLE.equals(message.getUserRole()))) {
-                return;
-            }
-
-            //自己的消息，已经显示过，此处不再显示
-            if (mSelfId.equals(message.getUserId())) {
-                return;
-            }
-
-            //开启聊天审核，不是自己发的消息不显示在界面上
-            if (!"0".equals(message.getStatus()) && !mSelfId.equals(message.getUserId())) {
-                return;
-            }
-
-            //检测showList是否超出最大值，如果超出最大值，则从头删除一部分在添加数据
-            int exceed = mShowList.size() - MAX_MESSAGE_NUM;
-            if (exceed > 0) {
-                for (int i = 0; i < EXCEED_REMOVE_NUM; i++) {
-                    mShowList.pollFirst();
-                }
-                mAdapter.notifyItemRangeRemoved(0, MAX_MESSAGE_NUM);
-            }
-
+    private void addApprovedDataToUi(ArrayList<String> msgList, String status) {
+        for (String chatId : msgList) {
             int index = mShowList.size() - 1;
             for (; index >= 0; --index) {
                 ChatMessage m = mShowList.get(index);
-                if (m.getPrivIndex() == -1) return;
-                int ret = cmp(m.getTime(), message.getTime());
-                if (ret > 0) {
-                    continue;
+                if (m.getChatId().equals(chatId)) {
+                    m.setStatus(status);
+                    if (m.getStatus().equals("0")) {
+                        CCEventBus.getDefault().post(new DanmuMessage(m));
+                    }
+                    break;
                 }
-                break;
             }
-            index = index + 1;
-            mShowList.add(index, message);
-            mAdapter.notifyItemInserted(index);
+
+            //添加显示
+            mAdapter.notifyDataSetChanged();
             if (shouldAutoScroll) {
                 mRecyclerView.scrollToPosition(mShowList.size() - 1);
             }
 
-
-            //检测是否是礼物消息
-            GiftMsg msg = SpannableCache.extractGift(message.getMessage());
-            if (msg != null) {
-                msg.userName = message.getUserName();
-                addGiftMsg(msg);
-                return;
-            }
-
-
-            //发送到弹幕显示，礼物消息不显示
-            CCEventBus.getDefault().post(new DanmuMessage(message));
         }
-    }
-
-
-    public static int cmp(String str1, String str2) {
-        int len1 = str1.length();
-        int len2 = str2.length();
-        int diff = len1 - len2;
-        if (diff != 0) {
-            return diff;
-        }
-        for (int i = 0; i < len1; ++i) {
-            diff = str1.charAt(i) - str2.charAt(i);
-            if (diff == 0) {
-                continue;
-            }
-            return diff;
-        }
-        return 0;
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceiveChatMsg(ChatMsgEntity msg) {
         if (msg.getType() == ChatMsgEntity.PUBLIC_CHAT) {
-
             ChatMessage message = (ChatMessage) msg.extra;
             int exceed = mMessageList.size() - MAX_MESSAGE_NUM;
             if (exceed > 0) {
@@ -366,6 +334,7 @@ public class ChatFragment extends GiftFragment {
             addUiToShow(message);
 
         } else if (msg.getType() == ChatMsgEntity.HISTORY_CHAT) { //历史聊天消息
+
             if (msg.extra instanceof List) {
                 List<ChatMessage> list = (List<ChatMessage>) msg.extra;
                 //增量消息
@@ -384,6 +353,7 @@ public class ChatFragment extends GiftFragment {
                 } else {
                     addList.addAll(list);
                 }
+
                 int exceed = mMessageList.size() + addList.size() - MAX_MESSAGE_NUM;
                 //缓存溢出，删除缓存
                 if (exceed > 0) {
@@ -405,7 +375,6 @@ public class ChatFragment extends GiftFragment {
      */
     private void addUiToShow(Object o) {
         if (o instanceof List) {
-
             List<ChatMessage> addList = (List<ChatMessage>) o;
             int exceed = mShowList.size() + addList.size() - MAX_MESSAGE_NUM;
             if (exceed > 0) {
@@ -414,7 +383,6 @@ public class ChatFragment extends GiftFragment {
                 }
                 mAdapter.notifyItemRangeRemoved(0, exceed);
             }
-
             //添加新消息
             int growth = 0;  //记录增加的数据
             for (int i = 0; i < addList.size(); i++) {
@@ -422,13 +390,9 @@ public class ChatFragment extends GiftFragment {
                 if (isOnlyShowTeacher && !TEACHER_ROLE.equals(message.getUserRole())) {
                     continue;
                 }
-                if ("0".equals(message.getStatus()) || mSelfId.equals(message.getUserId())) {
-                    growth++;
-                    mShowList.offerLast(message);
-
-                }
+                growth++;
+                mShowList.offerLast(message);
             }
-
             mAdapter.notifyItemRangeInserted(mShowList.size() - 1, growth);
             mRecyclerView.post(new Runnable() {
                 @Override
@@ -436,19 +400,12 @@ public class ChatFragment extends GiftFragment {
                     mRecyclerView.scrollToPosition(mShowList.size() - 1);
                 }
             });
-
         } else if (o instanceof ChatMessage) {
-
             ChatMessage message = (ChatMessage) o;
             if (isOnlyShowTeacher && (!TEACHER_ROLE.equals(message.getUserRole()) && !message.getUserId().equals(mSelfId))) {
                 return;
             }
-
             //开启聊天审核，同时也不是自己发的消息，则不显示在界面上
-            if (!"0".equals(message.getStatus()) && !mSelfId.equals(message.getUserId())) {
-                return;
-            }
-
             //检测showList是否超出最大值，如果超出最大值，则从头删除一部分在添加数据
             int exceed = mShowList.size() - MAX_MESSAGE_NUM;
             if (exceed > 0) {
@@ -457,8 +414,10 @@ public class ChatFragment extends GiftFragment {
                 }
                 mAdapter.notifyItemRangeRemoved(0, MAX_MESSAGE_NUM);
             }
+
             mShowList.offerLast(message);
             mAdapter.notifyItemInserted(mShowList.size() - 1);
+
             if (shouldAutoScroll) {
                 mRecyclerView.scrollToPosition(mShowList.size() - 1);
             }
@@ -471,6 +430,7 @@ public class ChatFragment extends GiftFragment {
                 return;
             }
             //发送到弹幕显示，礼物消息不显示
+            if (message.getStatus().equals("1")) return;
             CCEventBus.getDefault().post(new DanmuMessage(message));
         }
     }
@@ -483,7 +443,6 @@ public class ChatFragment extends GiftFragment {
     public void onVideoSwitch(OnVideoSwitchMsg message) {
         if (message.getType() == OnVideoSwitchMsg.PREPARE) {
             //不同课程视频切换前，聊天界面需要做的准备工作
-
         } else if (message.getType() == OnVideoSwitchMsg.START) {
             updateChatUi();
         }
