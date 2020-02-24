@@ -173,9 +173,7 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
     }
 
     //—————————————————————————————————— 扫码相关逻辑 ——————————————————————————————————————
-
     private static final int QR_REQUEST_CODE = 222;
-
     String userIdStr = "userid";  // 用户id
     String roomIdStr = "roomid";  // 房间id
     String liveIdStr = "liveid";  // 直播id

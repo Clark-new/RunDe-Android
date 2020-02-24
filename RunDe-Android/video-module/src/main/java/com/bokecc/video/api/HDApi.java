@@ -141,7 +141,6 @@ public class HDApi {
         }
     }
 
-
     public String getSelfId() {
         if (mApiType == ApiType.LIVE) {
             return DWLive.getInstance().getViewer().getId();
@@ -224,6 +223,8 @@ public class HDApi {
 
     public void pause() {
         if (mApiType == ApiType.LIVE) {
+            //直播没有暂停api只有stop
+            DWLive.getInstance().stop();
         } else if (mApiType == ApiType.REPLAY) {
             DWLiveReplay.getInstance().pause();
         }

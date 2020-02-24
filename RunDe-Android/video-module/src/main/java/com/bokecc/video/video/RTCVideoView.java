@@ -13,13 +13,14 @@ import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
 import com.bokecc.sdk.mobile.live.rtc.CCRTCRender;
 import com.bokecc.video.api.HDApi;
 import com.bokecc.video.route.RTCMessage;
-import com.bokecc.video.widget.ToastUtils;
 
 import org.webrtc.SurfaceViewRenderer;
 
 public abstract class RTCVideoView extends BaseVideoView implements RTCController {
 
     private CCRTCRender mRemoteRender;
+    //当连麦断开后，是否需要恢复直播
+    private boolean needResumeLiveOnDisconnect = false;
 
     public RTCVideoView(@NonNull Context context) {
         this(context, null);
@@ -58,15 +59,18 @@ public abstract class RTCVideoView extends BaseVideoView implements RTCControlle
         }
         mRemoteRender.setVisibility(VISIBLE);
         mRemoteRender.setBackgroundColor(0xff000000);
+        needResumeLiveOnDisconnect = true;
     }
 
     /**
-     * 连麦接通是对界面的处理
+     * 断开连麦
      */
-    private void onRTCDisConnected() {
-        //重新连接直播
-        HDApi.get().reconnectVideo();
+    private void onRTCDisconnected() {
         mRemoteRender.setVisibility(GONE);
+        //判断是否需要重新播放直播
+        if(needResumeLiveOnDisconnect){
+            HDApi.get().reconnectVideo();
+        }
     }
 
 
@@ -89,7 +93,7 @@ public abstract class RTCVideoView extends BaseVideoView implements RTCControlle
                 mVideoController.setRtcState(RTCMessage.RTC_STATE_CONNECTED);
                 break;
             case RTCMessage.RTC_STATE_DISCONNECTED:
-                onRTCDisConnected();
+                onRTCDisconnected();
                 mVideoController.setRtcState(RTCMessage.RTC_STATE_DISCONNECTED);
                 break;
         }

@@ -49,20 +49,14 @@ configurations.all {
 dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-
     implementation 'androidx.appcompat:appcompat:1.1.0'
-
     implementation 'com.liulishuo.filedownloader:library:1.7.6'
     implementation 'cn.dreamtobe.filedownloader:filedownloader-okhttp3-connection:1.1.0'
-
     implementation 'com.github.chrisbanes:PhotoView:2.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha01'
-
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
-
     implementation 'androidx.multidex:multidex:2.0.1'
-
     implementation project(path: ':video-module')
     implementation files('libs/core.jar')
 }

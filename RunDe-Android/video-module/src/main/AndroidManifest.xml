@@ -5,6 +5,9 @@
         <activity
             android:name=".ui.main.activity.VideoCourseActivity"
             android:screenOrientation="portrait"
+            android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden" />
+        <receiver android:name=".route.NotificationReceiver" >
+        </receiver>
     </application>
 </manifest>

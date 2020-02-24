@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +18,7 @@ import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.video.R;
 import com.bokecc.video.msg.AnnounceMsg;
 import com.bokecc.video.msg.BannedChatMsg;
+import com.bokecc.video.route.NotificationPlayMsg;
 import com.bokecc.video.route.PunchMsg;
 import com.bokecc.video.route.PunchResultMsg;
 import com.bokecc.video.route.QuestionnaireMsg;
@@ -109,6 +109,17 @@ public class VideoCourseActivity extends ClickActionActivity {
         super.onDestroy();
         if (CCEventBus.getDefault().isRegistered(this)) {
             CCEventBus.getDefault().unregister(this);
+        }
+    }
+
+
+    /**
+     * 接收到通知栏的结束播放的消息
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReceiveNotificationPlayMsg(NotificationPlayMsg message) {
+        if(message.code == NotificationPlayMsg.DESTROY){
+            finish();
         }
     }
 
@@ -220,4 +231,12 @@ public class VideoCourseActivity extends ClickActionActivity {
         intent.putExtra(VideoCourseFragment.SPECIAL_KEY, isSpecial);
         activity.startActivity(intent);
     }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+
 }

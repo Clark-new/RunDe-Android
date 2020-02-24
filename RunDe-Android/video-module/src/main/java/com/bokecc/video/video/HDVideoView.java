@@ -30,9 +30,9 @@ public class HDVideoView extends RTCVideoView {
         super(context, attrs, defStyleAttr);
     }
 
+    @Override
     public void videoStart() {
         if (checkNetwork()) return;
-
         if (mVideoController != null) {
             if (mCurrentPlayState == STATE_PLAYING || mCurrentPlayState == STATE_BUFFERED) {
                 mVideoController.setPlayState(STATE_PLAYING);
@@ -49,7 +49,7 @@ public class HDVideoView extends RTCVideoView {
     }
 
 
-    public void videoPuase() {
+    public void videoPause() {
         mCurrentPlayState = STATE_PAUSED;
         HDApi.get().pause();
         if (mVideoController != null) {

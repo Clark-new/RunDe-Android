@@ -26,25 +26,38 @@ import com.bokecc.video.video.HDVideoView;
  * 直播/点播控制器
  */
 public class StandardVideoController extends GestureVideoController implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+    //播放总时间和当前时间
     protected TextView mTotalTime, mCurrTime;
+    //全屏播放按钮
     protected ImageView mFullScreenButton;
+    //底部控制容器
     protected View mBottomContainer;
     protected SeekBar mVideoSeekBar;
     protected ImageView mBackButton;
+
+    //当前是否是直播视频
     private boolean mIsLive;
+    //当前是否正在拖动精度调
     private boolean mIsDragging;
 
+    //底部播放进度条
     private ProgressBar mBottomProgress;
+    //开始播放的大小按钮
     private ImageView mStartPlayBtnB;
     private ImageView mStartPlayBtnS;
+
+    //加载精度调
     private ProgressBar mLoadingProgress;
 
     private LinearLayout mOtherControlLayout;
+
+    //大小视频窗口交换按钮
     private ImageView mSwapBtn;
+    //分享按钮
     private ImageView mShareBtn;
     //连麦按钮
     private ImageView mRtcBtn;
-
+    //控制容器进入进出动画
     private Animation mShowAnim = AnimationUtils.loadAnimation(getContext(), R.anim.anim_alpha_in);
     private Animation mHideAnim = AnimationUtils.loadAnimation(getContext(), R.anim.anim_alpha_out);
 

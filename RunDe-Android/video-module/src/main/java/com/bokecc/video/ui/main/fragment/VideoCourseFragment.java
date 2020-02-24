@@ -1,13 +1,26 @@
 package com.bokecc.video.ui.main.fragment;
 
 import android.animation.ValueAnimator;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.os.Build;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.bokecc.sdk.mobile.live.eventbus.Subscribe;
 import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
@@ -18,18 +31,28 @@ import com.bokecc.video.api.HDApi;
 import com.bokecc.video.controller.OtherFunctionCallback;
 import com.bokecc.video.controller.StandardVideoController;
 import com.bokecc.video.route.DanmuMessage;
+import com.bokecc.video.route.NotificationPlayMsg;
+import com.bokecc.video.route.NotificationReceiver;
 import com.bokecc.video.route.OnVideoSwitchMsg;
 import com.bokecc.video.ui.chat.KeyBoardFragment;
+import com.bokecc.video.ui.main.activity.VideoCourseActivity;
 import com.bokecc.video.utils.CommonUtils;
 import com.bokecc.video.video.HDVideoView;
 import com.bokecc.video.video.RTCController;
 import com.bokecc.video.widget.FloatView;
 import com.bokecc.video.widget.MaxVideoContainer;
 
+import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
+
 public class VideoCourseFragment extends RTCControlFragment implements OtherFunctionCallback, OnFloatViewMoveListener, FloatView.OnDismissListener {
     private static final String TAG = "VideoCourseFragment";
 
-    //由于系统的UI自动隐藏了状态栏，到UI计算存在误差
+    private static final String CHANNEL_ID = "HD_SDK_CHANNEL_ID";
+
+    //TODO:这里更换当前课程的标题
+    private static final String courseTitle = "药店大学直播课程标题";
+
+    //由于系统的UI自动隐藏了状态栏，UI计算存在误差
     private int layoutOffsetHeight = 0;
 
     //视频播放控制器
@@ -44,9 +67,22 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     //存放floatView相对于屏幕的绝对坐标
     private int[] location = new int[2];
 
+    private boolean isManualPause = false;
+    private AudioManager mAudioManager;
+
+
+    @Override
+    protected void initData() {
+        super.initData();
+        mAudioManager = (AudioManager)getContext().getSystemService(Context.AUDIO_SERVICE);
+
+    }
+
     @Override
     protected void initView() {
         super.initView();
+
+
         mMaxContainer = findViewById(R.id.id_max_container);
         mVideoController = new StandardVideoController(getActivity());
         mVideoController.setOtherFunctionCallback(this);
@@ -56,6 +92,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         mVideoView.setVideoController(mVideoController);
         mVideoView.init(getContext());
         setUiMeasuredListener();
+
     }
 
     protected void setUiMeasuredListener() {
@@ -154,6 +191,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     @Override
     public void onResume() {
         super.onResume();
+        mAudioManager.requestAudioFocus(mAudioFocusChangeListener , AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         //必须在start之前先设置docview 给api
         if (HDApi.get().hasDoc()) {
             if (mDocView == null) {
@@ -165,21 +203,27 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         if (mFloatView != null && !mFloatView.hasAddToWindow()) {
             mFloatView.addToActivity(mRootView, anchorX, anchorY);
         }
-        mVideoView.videoStart();
-        mVideoController.resume();
+        if(!isManualPause){
+            mVideoView.videoStart();
+            mVideoController.resume();
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
         //如果不开启后台播放，则将此处放开
-        //mVideoView.pause();
+//        mVideoView.videoPause();
         if (mFloatView != null) {
             mFloatView.removeFromWindow();
         }
         mVideoController.pause();
+        if(mVideoView.isPlaying()){
+            createNotification(courseTitle,R.drawable.icon_pause);
+        }else{
+            createNotification(courseTitle,R.drawable.icon_play);
+        }
     }
-
 
     @Override
     public void onDestroyView() {
@@ -188,7 +232,10 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         mFloatView.removeFromWindow();
         mVideoView.release();
         mVideoController.release();
+        clearNotification();
     }
+
+
 
     @Override
     public boolean onBackPressed() {
@@ -245,6 +292,29 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     }
 
 
+
+    /**
+     * 接收到通知栏的暂停或者播放消息
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReceiveNotificationPlayMsg(NotificationPlayMsg message) {
+        if(message.code == NotificationPlayMsg.PLAY_PAUSE){
+            if(mVideoView.isPlaying()){
+                mVideoView.videoPause();
+                mVideoController.pause();
+                isManualPause = true;
+                createNotification(courseTitle,R.drawable.icon_play);
+            }else{
+                mVideoView.videoStart();
+                mVideoController.resume();
+                isManualPause = false;
+                createNotification(courseTitle,R.drawable.icon_pause);
+            }
+        }
+    }
+
+
+
     /**
      * 准备重新加载Ui
      * 做专题和和公开课UI切换
@@ -290,6 +360,9 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             mMaxContainer.addChildView(mVideoView);
         }
         mVideoView.videoStart();
+
+        //TODO:
+        createNotification("这是当前课程标题",R.drawable.icon_pause);
     }
 
 
@@ -413,6 +486,9 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         }
     }
 
+    /**
+     * 接收到聊天消息，添加到弹幕容器中
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceiveDanmuMsg(DanmuMessage msg) {
         if (mVideoController != null) {
@@ -432,5 +508,105 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             mVideoController.setSwapBtnState(StandardVideoController.SwapBtnState.OPEN_SCREEN);
         }
     }
+
+    /**
+     * 创建并更新通知
+     */
+    private void createNotification(String title,int playResId){
+        if(getContext() == null) return;
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setComponent(new ComponentName(getContext(), VideoCourseActivity.class));
+        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), CHANNEL_ID)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(false)
+                .setSmallIcon(R.drawable.user_head_icon)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
+
+        RemoteViews remoteViews = new RemoteViews(getContext().getPackageName(), R.layout.item_notification);
+        remoteViews.setTextViewText(R.id.id_content, title);
+        remoteViews.setImageViewResource(R.id.id_play_btn,playResId);
+        if(HDApi.get().getApiType() == HDApi.ApiType.LIVE){
+            remoteViews.setViewVisibility(R.id.id_last_one,View.GONE);
+            remoteViews.setViewVisibility(R.id.id_next_one,View.GONE);
+        }else{
+            remoteViews.setViewVisibility(R.id.id_last_one,View.VISIBLE);
+            remoteViews.setViewVisibility(R.id.id_next_one,View.VISIBLE);
+        }
+
+
+        //上一个
+        Intent lastAction = new Intent(getContext(), NotificationReceiver.class);
+        lastAction.setAction(NotificationReceiver.ACTION_LAST);
+        PendingIntent pendingLastAction = PendingIntent.getBroadcast(getContext(), -1,
+                lastAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //暂停播放
+        Intent pauseAction = new Intent(getContext(), NotificationReceiver.class);
+        pauseAction.setAction(NotificationReceiver.ACTION_PLAY_PAUSE);
+        PendingIntent pendingPauseAction = PendingIntent.getBroadcast(getContext(), -1,
+                pauseAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //下一个
+        Intent nextAction = new Intent(getContext(), NotificationReceiver.class);
+        nextAction.setAction(NotificationReceiver.ACTION_NEXT);
+        PendingIntent pendingNextAction = PendingIntent.getBroadcast(getContext(), -1,
+                nextAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //结束播放
+        Intent destroyAction = new Intent(getContext(), NotificationReceiver.class);
+        destroyAction.setAction(NotificationReceiver.ACTION_DESTROY);
+        PendingIntent pendingDestroyAction = PendingIntent.getBroadcast(getContext(), -1,
+                destroyAction, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        remoteViews.setOnClickPendingIntent(R.id.id_last_one, pendingLastAction);
+        remoteViews.setOnClickPendingIntent(R.id.id_play_btn, pendingPauseAction);
+        remoteViews.setOnClickPendingIntent(R.id.id_next_one, pendingNextAction);
+        remoteViews.setOnClickPendingIntent(R.id.id_close_play, pendingDestroyAction);
+
+        builder.setCustomContentView(remoteViews);
+        createNotificationChannel();
+        Notification build = builder.build();
+        build.flags = Notification.FLAG_NO_CLEAR;
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+        notificationManager.notify(1, build);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //TODO：
+            CharSequence name = "药店大学直播";
+            String description = "description";
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name,  NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription(description);
+            //锁屏显示通知
+            channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
+            NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void clearNotification() {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getContext());
+        notificationManager.cancel(1);
+    }
+
+    private AudioManager.OnAudioFocusChangeListener mAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+           switch (focusChange){
+               case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+               case AudioManager.AUDIOFOCUS_LOSS:{
+                   mVideoView.videoPause();
+                   mVideoController.pause();
+                   isManualPause = true;
+                   createNotification(courseTitle,R.drawable.icon_play);
+               }
+           }
+        }
+    };
+
 }
 

@@ -154,14 +154,21 @@ public abstract class BaseVideoView extends FrameLayout implements MediaPlayerCo
 
     @Override
     public void start() {
-        mCurrentPlayState = STATE_PLAYING;
-        if (mPlayer != null) {
-            mPlayer.start();
-        }
-        if (mVideoController != null) {
-            mVideoController.setPlayState(STATE_PLAYING);
+        if(HDApi.get().getApiType() == HDApi.ApiType.LIVE
+            && mCurrentPlayState == STATE_PAUSED){
+            videoStart();
+        }else{
+            mCurrentPlayState = STATE_PLAYING;
+            if (mPlayer != null) {
+                mPlayer.start();
+            }
+            if (mVideoController != null) {
+                mVideoController.setPlayState(STATE_PLAYING);
+            }
         }
     }
+
+    protected abstract void videoStart();
 
     @Override
     public void pause() {

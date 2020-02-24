@@ -199,11 +199,7 @@ public class ChatFragment extends GiftFragment {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEndStream(EndStreamMsg msg) {
-        //因为直播聊天是按着相对时间进行的，当老师出现一次上下课时
-        //为了保留上一次直播的聊天信息，我们将上一次直播的聊天最后一条信息时间设置成负值
-        if (mShowList.size() > 0) {
-            mShowList.get(mShowList.size() - 1).setPrivIndex(-1);
-        }
+
     }
 
 
