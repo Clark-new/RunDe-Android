@@ -20,6 +20,7 @@ import com.bokecc.sdk.mobile.live.rtc.CCRTCRender;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 import com.bokecc.video.msg.AnnounceMsg;
 import com.bokecc.video.msg.BannedChatMsg;
+import com.bokecc.video.msg.RewardMsg;
 import com.bokecc.video.route.OnVideoSwitchMsg;
 
 import org.webrtc.EglBase;
@@ -27,7 +28,6 @@ import org.webrtc.SurfaceViewRenderer;
 
 public class HDApi {
     private static final String TAG = "HDApi";
-
 
     public enum ApiType {
         LIVE, REPLAY
@@ -165,8 +165,12 @@ public class HDApi {
         sendPublicChatMsg(content + "[cem_" + url + "]x" + num);
     }
 
-    public void sendRewardMsg(String content, String url, int num) {
-        sendPublicChatMsg(content + "[cem_" + url + "]¥" + num);
+    public void sendRewardMsg() {
+        if (mApiType == ApiType.LIVE) {
+            if (isBanned) {
+                CCEventBus.getDefault().post(new RewardMsg(!HDApi.get().isBanned));
+            }
+        }
     }
 
 

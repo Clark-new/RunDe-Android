@@ -31,6 +31,7 @@ public class ClickActionActivity extends BaseActivity {
             case ClickAction.ON_CLICK_REWARD:
                 ELog.i(TAG, "ON_CLICK_REWARD");
                 //TODO:点击打赏按钮触发
+                HDApi.get().sendRewardMsg();
                 break;
             case ClickAction.ON_CLICK_EVALUATE:
                 ELog.i(TAG, "ON_CLICK_EVALUATE");

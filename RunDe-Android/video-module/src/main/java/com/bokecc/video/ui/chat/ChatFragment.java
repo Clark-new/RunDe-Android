@@ -7,12 +7,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bokecc.sdk.mobile.live.eventbus.CCEventBus;
 import com.bokecc.sdk.mobile.live.eventbus.Subscribe;
 import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
+import com.bokecc.sdk.mobile.live.logging.ELog;
 import com.bokecc.sdk.mobile.live.pojo.ChatMessage;
 import com.bokecc.video.R;
 import com.bokecc.video.adapter.MultiItemTypeAdapter;
@@ -49,6 +51,7 @@ public class ChatFragment extends GiftFragment {
     private boolean isOnlyShowTeacher = false;
     //判断是否自动滚动到底部，当最后一条聊天数据显示时，自动滚动到底部，否则不自动滚动到底部
     private boolean shouldAutoScroll = true;
+    private LinearLayoutManager mLayoutManager;
 
     @Override
     public int getRootResource() {
@@ -71,7 +74,8 @@ public class ChatFragment extends GiftFragment {
     protected void initView() {
         super.initView();
         mRecyclerView = findViewById(R.id.id_recycler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(null);
         mAdapter = new MultiItemTypeAdapter<>(getContext(), mShowList);
         mAdapter.addItemViewDelegate(new OtherChatItem());
@@ -304,13 +308,11 @@ public class ChatFragment extends GiftFragment {
                     break;
                 }
             }
-
-            //添加显示
-            mAdapter.notifyDataSetChanged();
-            if (shouldAutoScroll) {
-                mRecyclerView.scrollToPosition(mShowList.size() - 1);
-            }
-
+        }
+        //添加显示
+        mAdapter.notifyDataSetChanged();
+        if (shouldAutoScroll) {
+            mLayoutManager.scrollToPositionWithOffset(mShowList.size() - 1,0);
         }
     }
 

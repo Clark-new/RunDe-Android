@@ -106,7 +106,6 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
 
     private void initViews() {
 
-
         mRoot = getWindow().getDecorView().findViewById(android.R.id.content);
 
         findViewById(R.id.iv_back).setOnClickListener(this);
@@ -130,10 +129,6 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
                 .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
 
-
-        lllLoginLiveRoomid.setText("59261EA8EED5CD919C33DC5901307461");
-        lllLoginLiveUid.setText("358B27E7B04F3B02");
-        lllLoginLiveName.setText("tt");
 
         btnLoginLive.setOnClickListener(new View.OnClickListener() {
             @Override

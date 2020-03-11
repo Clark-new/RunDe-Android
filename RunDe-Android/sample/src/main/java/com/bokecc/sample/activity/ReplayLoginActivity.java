@@ -154,12 +154,14 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
 
     private void writeSharePreference() {
         SharedPreferences.Editor editor = preferences.edit();
+
         editor.putString("replayuid", lllLoginReplayUid.getText());
         editor.putString("replayroomid", lllLoginReplayRoomid.getText());
         editor.putString("replayliveid", lllLoginReplayLiveid.getText());
         editor.putString("replayrecordid", lllLoginReplayRecordid.getText());
         editor.putString("replayusername", lllLoginReplayName.getText());
         editor.putString("replaypassword", lllLoginReplayPassword.getText());
+
         editor.commit();
     }
 

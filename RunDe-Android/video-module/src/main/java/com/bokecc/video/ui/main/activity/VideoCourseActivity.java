@@ -18,6 +18,7 @@ import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.video.R;
 import com.bokecc.video.msg.AnnounceMsg;
 import com.bokecc.video.msg.BannedChatMsg;
+import com.bokecc.video.msg.RewardMsg;
 import com.bokecc.video.route.NotificationPlayMsg;
 import com.bokecc.video.route.PunchMsg;
 import com.bokecc.video.route.PunchResultMsg;
@@ -213,6 +214,21 @@ public class VideoCourseActivity extends ClickActionActivity {
             if (mUNBannedChatDialog.isShow()) return;
             mUNBannedChatDialog.setBanned(false);
             mUNBannedChatDialog.show(getSupportFragmentManager(), "all_unbanned_dialog");
+        }
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReceiveRewardMsg(RewardMsg rewardMsg) {
+        if (rewardMsg.isReward) {
+            // TODO: 2020-03-10 打赏结果
+
+        } else {
+            // TODO: 2020-03-10 打赏失败
+            if (mUNBannedChatDialog.isShow()) {
+                mUNBannedChatDialog.dismiss();
+            }
+            if (mBannedChatDialog.isShow()) return;
+            mBannedChatDialog.setBanned(true);
+            mBannedChatDialog.show(getSupportFragmentManager(), "all_banned_dialog");
         }
     }
 

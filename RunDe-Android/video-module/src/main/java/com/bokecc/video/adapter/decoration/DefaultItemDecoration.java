@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * Created by Sivin on 2017/2/16.
  */
 
-public class DefalutItemDecoration extends RecyclerView.ItemDecoration {
+public class DefaultItemDecoration extends RecyclerView.ItemDecoration {
 
 
     private Context mContext;
@@ -35,7 +35,7 @@ public class DefalutItemDecoration extends RecyclerView.ItemDecoration {
             android.R.attr.listDivider
     };
 
-    public DefalutItemDecoration(Context context, int orientation, int resId) {
+    public DefaultItemDecoration(Context context, int orientation, int resId) {
         this.mContext = context;
         if (resId == 0) {
             final TypedArray ta = context.obtainStyledAttributes(ATRRS);

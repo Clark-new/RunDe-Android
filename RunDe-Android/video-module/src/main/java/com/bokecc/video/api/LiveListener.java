@@ -39,22 +39,18 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onQuestion(Question question) {
-
     }
 
     @Override
     public void onPublishQuestion(String s) {
-
     }
 
     @Override
     public void onAnswer(Answer answer) {
-
     }
 
     @Override
     public void onLiveStatus(DWLive.PlayStatus playStatus) {
-
     }
 
     @Override
@@ -67,22 +63,8 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onHistoryChatMessage(ArrayList<ChatMessage> arrayList) {
-
         //获取到历史聊天消息
         CCEventBus.getDefault().post(new ChatMsgEntity(ChatMsgEntity.HISTORY_CHAT, arrayList));
-    }
-
-
-    /**
-     * 计算两个时间的相对秒数
-     *
-     * @param start "2020-01-16 19:00:19"
-     * @param end   "19:20:19"
-     * @return 1200
-     */
-    private int calculateRelativeSecond(String start, String end) {
-        String startTmp = start.substring(11);
-        return calcPassTime(startTmp, end);
     }
 
     public int calcPassTime(String start, String end) {
@@ -97,19 +79,6 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onPublicChatMessage(ChatMessage chatMessage) {
-        /*
-         * 直播过程中发送过来的时间是绝对时间"19:20:19"，但是历史聊天消息是相对直播开始时间的相对时间
-         * 这里为了方便统一计算，我们将绝对时间统一计算成相对时间
-         */
-
-//        LiveInfo liveInfo = HDApi.get().getLiveInfo();
-//
-//        if (liveInfo != null) {
-//            String liveStartTime = liveInfo.getLiveStartTime();
-//            int second = calculateRelativeSecond(liveStartTime, chatMessage.getTime());
-//            chatMessage.setTime(second + "");
-//        }
-
         CCEventBus.getDefault().post(new ChatMsgEntity(ChatMsgEntity.PUBLIC_CHAT, chatMessage));
     }
 
@@ -200,7 +169,7 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onRoomSettingInfo(SettingInfo settingInfo) {
-
+        HDApi.get().isBanned = !settingInfo.getAllow_chat();
     }
 
     @Override
@@ -284,37 +253,30 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onStartLottery(String s) {
-
     }
 
     @Override
     public void onLotteryResult(boolean b, String s, String s1, String s2) {
-
     }
 
     @Override
     public void onStopLottery(String s) {
-
     }
 
     @Override
     public void onVoteStart(int i, int i1) {
-
     }
 
     @Override
     public void onVoteStop() {
-
     }
 
     @Override
     public void onVoteResult(JSONObject jsonObject) {
-
     }
 
     @Override
     public void onPrizeSend(int i, String s, String s1) {
-
     }
 
     @Override
@@ -329,41 +291,33 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onQuestionnaireStatis(QuestionnaireStatisInfo questionnaireStatisInfo) {
-
     }
 
     @Override
     public void onExeternalQuestionnairePublish(String s, String s1) {
-
     }
 
     @Override
     public void onPracticePublish(PracticeInfo practiceInfo) {
-
     }
 
     @Override
     public void onPracticeSubmitResult(PracticeSubmitResultInfo practiceSubmitResultInfo) {
-
     }
 
     @Override
     public void onPracticStatis(PracticeStatisInfo practiceStatisInfo) {
-
     }
 
     @Override
     public void onPracticRanking(PracticeRankInfo practiceRankInfo) {
-
     }
 
     @Override
     public void onPracticeStop(String s) {
-
     }
 
     @Override
     public void onPracticeClose(String s) {
-
     }
 }

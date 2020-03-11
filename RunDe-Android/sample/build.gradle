@@ -15,20 +15,20 @@ android {
         }
     }
 
-    signingConfigs {
-        release {
-            storeFile file('F:/CC_Work/trunk/play/sdk_demo_as/signkey.jks')
-            storePassword '123456'
-            keyAlias = 'key0'
-            keyPassword '123456'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file('F:/CC_Work/trunk/play/sdk_demo_as/signkey.jks')
+//            storePassword '123456'
+//            keyAlias = 'key0'
+//            keyPassword '123456'
+//        }
+//    }
 
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
 

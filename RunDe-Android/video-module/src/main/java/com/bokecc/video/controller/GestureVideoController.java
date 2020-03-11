@@ -41,8 +41,6 @@ public abstract class GestureVideoController extends DanmakuController {
                 return mGestureDetector.onTouchEvent(event);
             }
         });
-
-
     }
 
     protected class MyGestureListener extends GestureDetector.SimpleOnGestureListener {

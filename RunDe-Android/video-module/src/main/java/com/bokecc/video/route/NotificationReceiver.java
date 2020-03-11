@@ -7,10 +7,12 @@ import android.content.Intent;
 import com.bokecc.sdk.mobile.live.eventbus.CCEventBus;
 
 public class NotificationReceiver extends BroadcastReceiver {
+
     public static final String ACTION_LAST = "hd_notification_last";
     public static final String ACTION_PLAY_PAUSE = "hd_notification_play_pause";
     public static final String ACTION_NEXT = "hd_notification_next";
     public static final String ACTION_DESTROY = "hd_notification_destroy";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();

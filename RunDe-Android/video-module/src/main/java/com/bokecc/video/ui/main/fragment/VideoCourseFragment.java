@@ -69,20 +69,18 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
 
     private boolean isManualPause = false;
     private AudioManager mAudioManager;
-
+    private boolean mFirstEnter = true;
 
     @Override
     protected void initData() {
         super.initData();
+        mFirstEnter = true;
         mAudioManager = (AudioManager)getContext().getSystemService(Context.AUDIO_SERVICE);
-
     }
 
     @Override
     protected void initView() {
         super.initView();
-
-
         mMaxContainer = findViewById(R.id.id_max_container);
         mVideoController = new StandardVideoController(getActivity());
         mVideoController.setOtherFunctionCallback(this);
@@ -196,10 +194,10 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         if (HDApi.get().hasDoc()) {
             if (mDocView == null) {
                 mDocView = new DocView(getContext().getApplicationContext());
+                mDocView.changeBackgroundColor("#888888");
             }
             HDApi.get().setDocView(mDocView);
         }
-
         if (mFloatView != null && !mFloatView.hasAddToWindow()) {
             mFloatView.addToActivity(mRootView, anchorX, anchorY);
         }
@@ -340,13 +338,6 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
                 mFloatView = new FloatView(getContext(), 0, 0);
                 mFloatView.setOnDismissListener(this);
             }
-            if (mFloatView.hasAddToWindow()) {
-                mFloatView.updatePosition(anchorX, anchorY);
-            } else {
-                mFloatView.addToActivity(mRootView, anchorX, anchorY);
-            }
-            mMaxContainer.removeChildView();
-            mFloatView.removeChildView();
             mMaxContainer.addChildView(mDocView);
             mFloatView.addChildView(mVideoView);
             HDApi.get().setDocView(mDocView);
@@ -362,6 +353,13 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         mVideoView.videoStart();
 
         //TODO:
+        if (mFloatView.hasAddToWindow()) {
+            mFloatView.updatePosition(anchorX, anchorY);
+        } else {
+            mFloatView.addToActivity(mRootView, anchorX, anchorY);
+        }
+        mMaxContainer.removeChildView();
+        mFloatView.removeChildView();
         createNotification("这是当前课程标题",R.drawable.icon_pause);
     }
 
@@ -596,14 +594,19 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     private AudioManager.OnAudioFocusChangeListener mAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-           switch (focusChange){
+           ELog.e("Sivin","focusChange:"+focusChange);
+            switch (focusChange){
                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-               case AudioManager.AUDIOFOCUS_LOSS:{
+               case AudioManager.AUDIOFOCUS_LOSS:
+                   if(mFirstEnter) {
+                       mFirstEnter = false;
+                       return;
+                   }
                    mVideoView.videoPause();
                    mVideoController.pause();
                    isManualPause = true;
                    createNotification(courseTitle,R.drawable.icon_play);
-               }
+
            }
         }
     };
