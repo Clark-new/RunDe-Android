@@ -22,6 +22,7 @@ public abstract class BaseVideoFragment extends BaseFragment implements HandleBa
     public static String SPECIAL_KEY = "is_special_course";
     public static String SPECIAL_COURSE_UI = "special_course_ui";
     public static String OPEN_COURSE_UI = "open_course_ui";
+    public static String MARQUEE = "marquee";
     //小title状态
     protected static final int NARROW_STATE = 0;
     //宽title状态

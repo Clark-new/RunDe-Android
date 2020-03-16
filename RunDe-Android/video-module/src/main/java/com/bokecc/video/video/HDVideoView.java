@@ -1,15 +1,24 @@
 package com.bokecc.video.video;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bokecc.sdk.mobile.live.eventbus.Subscribe;
 import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.video.api.HDApi;
+import com.bokecc.video.msg.MarqueeAction;
 import com.bokecc.video.route.OnVideoSwitchMsg;
+import com.bokecc.video.widget.MarqueeView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 视频播放视图
@@ -17,6 +26,7 @@ import com.bokecc.video.route.OnVideoSwitchMsg;
 public class HDVideoView extends RTCVideoView {
 
     private static final String TAG = "HDVideoView";
+    private MarqueeView marqueeView;
 
     public HDVideoView(@NonNull Context context) {
         this(context, null);
@@ -28,8 +38,54 @@ public class HDVideoView extends RTCVideoView {
 
     public HDVideoView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
 
+    }
+    public void removeMarquee(){
+        if (marqueeView!=null){
+            removeView(marqueeView);
+        }
+    }
+    public void setMarquee(Activity activity,Marquee marquee){
+        if (marqueeView!=null){
+            removeView(marqueeView);
+        }
+        if (marquee != null && marquee.getAction() != null) {
+            marqueeView = new MarqueeView(activity);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+            marqueeView.setVisibility(GONE);
+            addView(marqueeView, params);
+            marqueeView.setVisibility(VISIBLE);
+            List<MarqueeAction> marqueeActions = new ArrayList<>();
+            for (int x = 0; x < marquee.getAction().size(); x++) {
+                com.bokecc.sdk.mobile.live.pojo.MarqueeAction marqueeAction1 = marquee.getAction().get(x);
+                MarqueeAction marqueeAction = new MarqueeAction();
+                marqueeAction.setIndex(x);
+                marqueeAction.setDuration(marqueeAction1.getDuration()*1000);
+                marqueeAction.setStartXpos((float) marqueeAction1.getStart().getXpos());
+                marqueeAction.setStartYpos((float) marqueeAction1.getStart().getYpos());
+                marqueeAction.setStartAlpha((float) marqueeAction1.getStart().getAlpha());
+                marqueeAction.setEndXpos((float) marqueeAction1.getEnd().getXpos());
+                marqueeAction.setEndYpos((float) marqueeAction1.getEnd().getYpos());
+                marqueeAction.setEndAlpha((float) marqueeAction1.getEnd().getAlpha());
+                marqueeActions.add(marqueeAction);
+            }
+            marqueeView.setLoop(marquee.getLoop());
+            marqueeView.setMarqueeActions(marqueeActions);
+            if (marquee.getType().equals("text")) {
+                marqueeView.setTextContent(marquee.getText().getContent());
+                marqueeView.setTextColor(marquee.getText().getColor());
+                marqueeView.setTextFontSize((int) (marquee.getText().getFont_size() * activity.getResources().getDisplayMetrics().density + 0.5f));
+                marqueeView.setType(1);
+            } else {
+                marqueeView.setMarqueeImage(activity, marquee.getImage().getImage_url(), marquee.getImage().getWidth(), marquee.getImage().getHeight());
+                marqueeView.setType(2);
+            }
+
+            marqueeView.start();
+        }
+    }
     @Override
     public void videoStart() {
         if (checkNetwork()) return;

@@ -25,11 +25,13 @@ import androidx.core.app.NotificationManagerCompat;
 import com.bokecc.sdk.mobile.live.eventbus.Subscribe;
 import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
 import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.widget.DocView;
 import com.bokecc.video.R;
 import com.bokecc.video.api.HDApi;
 import com.bokecc.video.controller.OtherFunctionCallback;
 import com.bokecc.video.controller.StandardVideoController;
+import com.bokecc.video.msg.MarqueeAction;
 import com.bokecc.video.route.DanmuMessage;
 import com.bokecc.video.route.NotificationPlayMsg;
 import com.bokecc.video.route.NotificationReceiver;
@@ -39,9 +41,15 @@ import com.bokecc.video.ui.main.activity.VideoCourseActivity;
 import com.bokecc.video.utils.CommonUtils;
 import com.bokecc.video.video.HDVideoView;
 import com.bokecc.video.video.RTCController;
+import com.bokecc.video.widget.DocWebView;
 import com.bokecc.video.widget.FloatView;
+import com.bokecc.video.widget.MarqueeView;
 import com.bokecc.video.widget.MaxVideoContainer;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.view.View.VISIBLE;
 import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
 
 public class VideoCourseFragment extends RTCControlFragment implements OtherFunctionCallback, OnFloatViewMoveListener, FloatView.OnDismissListener {
@@ -63,14 +71,13 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     private HDVideoView mVideoView;
     private FloatView mFloatView;
     //文档视图
-    private DocView mDocView;
+    private DocWebView mDocView;
     //存放floatView相对于屏幕的绝对坐标
     private int[] location = new int[2];
 
     private boolean isManualPause = false;
     private AudioManager mAudioManager;
     private boolean mFirstEnter = true;
-
     @Override
     protected void initData() {
         super.initData();
@@ -90,9 +97,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         mVideoView.setVideoController(mVideoController);
         mVideoView.init(getContext());
         setUiMeasuredListener();
-
     }
-
     protected void setUiMeasuredListener() {
         mRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -119,7 +124,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             if (HDApi.get().hasDoc()) {
                 //文档视图
                 if (mDocView == null) {
-                    mDocView = new DocView(getContext().getApplicationContext());
+                    mDocView = new DocWebView(getContext().getApplicationContext());
                 }
                 if (mFloatView == null) {
                     mFloatView = new FloatView(getContext(), 150, 85);
@@ -147,7 +152,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             if (HDApi.get().hasDoc()) {
                 //文档视图
                 if (mDocView == null) {
-                    mDocView = new DocView(getContext().getApplicationContext());
+                    mDocView = new DocWebView(getContext().getApplicationContext());
                 }
                 if (mFloatView == null) {
                     mFloatView = new FloatView(getContext(), 150, 85);
@@ -193,7 +198,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         //必须在start之前先设置docview 给api
         if (HDApi.get().hasDoc()) {
             if (mDocView == null) {
-                mDocView = new DocView(getContext().getApplicationContext());
+                mDocView = new DocWebView(getContext().getApplicationContext());
                 mDocView.changeBackgroundColor("#888888");
             }
             HDApi.get().setDocView(mDocView);
@@ -204,6 +209,12 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         if(!isManualPause){
             mVideoView.videoStart();
             mVideoController.resume();
+        }
+        //设置跑马灯
+        if (getActivity() instanceof VideoCourseActivity){
+            VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
+            mVideoView.setMarquee(getActivity(),videoCourseActivity.getMarquee());
+            mDocView.setMarquee(getActivity(),videoCourseActivity.getMarquee());
         }
     }
 
@@ -257,9 +268,22 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             View view2 = mMaxContainer.removeChildView();
             mMaxContainer.addChildView(view1);
             mFloatView.addChildView(view2);
+            //设置跑马灯
+            if (mVideoView!=null&&getActivity() instanceof VideoCourseActivity){
+                VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
+                mVideoView.setMarquee(getActivity(),videoCourseActivity.getMarquee());
+                mDocView.setMarquee(getActivity(),videoCourseActivity.getMarquee());
+            }
         }
     }
 
+    public HDVideoView getmVideoView() {
+        return mVideoView;
+    }
+
+    public DocWebView getmDocView() {
+        return mDocView;
+    }
 
     @Override
     public RTCController getRTCController() {
@@ -332,7 +356,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         if (HDApi.get().hasDoc()) {
             //文档视图
             if (mDocView == null) {
-                mDocView = new DocView(getContext().getApplicationContext());
+                mDocView = new DocWebView(getContext().getApplicationContext());
             }
             if (mFloatView == null) {
                 mFloatView = new FloatView(getContext(), 0, 0);
@@ -361,6 +385,14 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         mMaxContainer.removeChildView();
         mFloatView.removeChildView();
         createNotification("这是当前课程标题",R.drawable.icon_pause);
+        //重新获取跑马灯
+        mVideoView.setMarquee(getActivity(),HDApi.get().getMarquee());
+        mDocView.setMarquee(getActivity(),HDApi.get().getMarquee());
+        if (getActivity() instanceof VideoCourseActivity){
+            VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
+            videoCourseActivity.setMarquee(HDApi.get().getMarquee());
+        }
+
     }
 
 
@@ -530,8 +562,8 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             remoteViews.setViewVisibility(R.id.id_last_one,View.GONE);
             remoteViews.setViewVisibility(R.id.id_next_one,View.GONE);
         }else{
-            remoteViews.setViewVisibility(R.id.id_last_one,View.VISIBLE);
-            remoteViews.setViewVisibility(R.id.id_next_one,View.VISIBLE);
+            remoteViews.setViewVisibility(R.id.id_last_one, VISIBLE);
+            remoteViews.setViewVisibility(R.id.id_next_one, VISIBLE);
         }
 
 

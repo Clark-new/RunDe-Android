@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.bokecc.sdk.mobile.live.eventbus.CCEventBus;
 import com.bokecc.sdk.mobile.live.eventbus.Subscribe;
 import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.PunchAction;
 import com.bokecc.sdk.mobile.live.pojo.QuestionnaireInfo;
 import com.bokecc.video.R;
@@ -45,7 +46,7 @@ public class VideoCourseActivity extends ClickActionActivity {
     //打卡dialog
     private PunchDialog mPunchDialog;
     private AnnounceDialog mAnnounceDialog;
-
+    private Marquee marquee;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +61,7 @@ public class VideoCourseActivity extends ClickActionActivity {
     }
 
     private void initData() {
-
+        marquee = (Marquee) getIntent().getSerializableExtra(VideoCourseFragment.MARQUEE);
     }
 
     private void initView() {
@@ -75,6 +76,19 @@ public class VideoCourseActivity extends ClickActionActivity {
     private void initEvent() {
     }
 
+    public Marquee getMarquee() {
+        return marquee;
+    }
+
+    public void setMarquee(Marquee marquee) {
+        this.marquee = marquee;
+    }
+
+    public VideoCourseFragment getVideoFragment() {
+        if (videoFragment!=null&&videoFragment instanceof VideoCourseFragment)
+        return (VideoCourseFragment) videoFragment;
+        return null;
+    }
 
     private void addDetailFragment(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
@@ -242,9 +256,10 @@ public class VideoCourseActivity extends ClickActionActivity {
     }
 
 
-    public static void go(Activity activity, boolean isSpecial) {
+    public static void go(Activity activity, boolean isSpecial, Marquee marquee) {
         Intent intent = new Intent(activity, VideoCourseActivity.class);
         intent.putExtra(VideoCourseFragment.SPECIAL_KEY, isSpecial);
+        intent.putExtra(VideoCourseFragment.MARQUEE, marquee);
         activity.startActivity(intent);
     }
 

@@ -8,6 +8,7 @@ import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
 import com.bokecc.sdk.mobile.live.eventbus.CCEventBus;
 import com.bokecc.sdk.mobile.live.pojo.LiveInfo;
 import com.bokecc.sdk.mobile.live.pojo.LoginInfo;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.PublishInfo;
 import com.bokecc.sdk.mobile.live.pojo.PunchCommitRespone;
 import com.bokecc.sdk.mobile.live.pojo.RoomInfo;
@@ -100,21 +101,22 @@ public class HDApi {
     public void setReplayLoginListener(ReplayLoginInfo replayLoginInfo, final DWLiveReplayLoginListener listener) {
         mApiType = ApiType.REPLAY;
         DWLiveReplay.getInstance().setLoginParams(new DWLiveReplayLoginListener() {
-            @Override
-            public void onLogin(TemplateInfo template) {
-                templateInfo = template;
-                if (listener != null) {
-                    listener.onLogin(templateInfo);
-                }
-                //发送视频切换的消息
-                CCEventBus.getDefault().post(new OnVideoSwitchMsg(OnVideoSwitchMsg.START, ""));
-            }
 
             @Override
             public void onException(DWLiveException e) {
                 if (listener != null) {
                     listener.onException(e);
                 }
+            }
+
+            @Override
+            public void onLogin(TemplateInfo template, Marquee marquee) {
+                templateInfo = template;
+                if (listener != null) {
+                    listener.onLogin(templateInfo,marquee);
+                }
+                //发送视频切换的消息
+                CCEventBus.getDefault().post(new OnVideoSwitchMsg(OnVideoSwitchMsg.START, ""));
             }
         }, replayLoginInfo);
     }
@@ -157,7 +159,9 @@ public class HDApi {
             return null;
         }
     }
-
+    public Marquee getMarquee(){
+        return  DWLive.getInstance().getViewer().getMarquee();
+    }
     /**
      * 发送礼物
      */

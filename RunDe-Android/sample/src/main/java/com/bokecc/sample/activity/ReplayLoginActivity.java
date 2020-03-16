@@ -18,6 +18,7 @@ import com.bokecc.sample.popup.LoginPopupWindow;
 import com.bokecc.sample.scan.qr_codescan.MipcaActivityCapture;
 import com.bokecc.sample.widget.LoginLineLayout;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
 import com.bokecc.sdk.mobile.live.pojo.TemplateInfo;
 import com.bokecc.sdk.mobile.live.replay.DWLiveReplayLoginListener;
 import com.bokecc.sdk.mobile.live.replay.pojo.ReplayLoginInfo;
@@ -133,11 +134,11 @@ public class ReplayLoginActivity extends BaseActivity implements View.OnClickLis
             }
 
             @Override
-            public void onLogin(TemplateInfo templateInfo) {
+            public void onLogin(TemplateInfo templateInfo, Marquee marquee) {
                 dismissPopupWindow();
                 writeSharePreference();
                 toastOnUiThread("登录成功");
-                VideoCourseActivity.go(ReplayLoginActivity.this,false); // 回放默认Demo页
+                VideoCourseActivity.go(ReplayLoginActivity.this,false,marquee); // 回放默认Demo页
                 // go(ReplayPlayDocActivity.class);  // 回放'文档大屏/视频小屏'的Demo页
                 dismissPopupWindow();
             }

@@ -127,6 +127,11 @@ public class LiveListener implements DWLiveListener {
     }
 
     @Override
+    public void onBanDeleteChat(String s) {
+
+    }
+
+    @Override
     public void onPrivateChat(PrivateChatInfo privateChatInfo) {
 
     }

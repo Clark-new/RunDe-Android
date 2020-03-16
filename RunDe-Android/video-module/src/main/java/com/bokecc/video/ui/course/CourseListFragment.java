@@ -13,6 +13,7 @@ import com.bokecc.video.api.HDApi;
 import com.bokecc.video.api.VideoInfo;
 import com.bokecc.video.route.NotificationPlayMsg;
 import com.bokecc.video.ui.base.BaseFragment;
+import com.bokecc.video.ui.main.activity.VideoCourseActivity;
 
 public class CourseListFragment extends BaseFragment implements View.OnClickListener {
     private static final String TAG = "CourseListFragment";
@@ -37,6 +38,7 @@ public class CourseListFragment extends BaseFragment implements View.OnClickList
             mVideoInfo.setLiveId("9C211CAFB37E1E85");
             mVideoInfo.setRecordId("94C3C69E37642E1F");
             mVideoInfo.setViewerName("replay2");
+            remmoveMarquee();
             HDApi.get().switchVideo(mVideoInfo, HDApi.ApiType.REPLAY);
         }else if(message.code == NotificationPlayMsg.NEXT){
             ELog.i(TAG,"switch next course");
@@ -47,10 +49,23 @@ public class CourseListFragment extends BaseFragment implements View.OnClickList
             mVideoInfo.setRecordId("8B04FD894E08A94E");
             mVideoInfo.setViewerToken("123");
             mVideoInfo.setViewerName("replay2");
+            remmoveMarquee();
             HDApi.get().switchVideo(mVideoInfo, HDApi.ApiType.REPLAY);
         }
     }
 
+    /**
+     * 移除跑马灯
+     */
+    public void remmoveMarquee(){
+        if (getActivity() instanceof VideoCourseActivity){
+            VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
+            if (videoCourseActivity.getVideoFragment()!=null){
+                videoCourseActivity.getVideoFragment().getmVideoView().removeMarquee();
+                videoCourseActivity.getVideoFragment().getmDocView().removeMarquee();
+            }
+        }
+    }
     @Override
     public int getRootResource() {
         return R.layout.layout_menu_list_fragment;
@@ -88,8 +103,8 @@ public class CourseListFragment extends BaseFragment implements View.OnClickList
             mVideoInfo.setUserId(TestConstanst.USERID);
             mVideoInfo.setViewerName(TestConstanst.USERNAME);
             mVideoInfo.setViewerToken(TestConstanst.USERTOKEN);
+            remmoveMarquee();
             HDApi.get().switchVideo(mVideoInfo, HDApi.ApiType.LIVE);
-
         } else if (id == R.id.id_replay_1) {
             mVideoInfo = new VideoInfo();
             mVideoInfo.setRoomId("D7123DC27A274C9C9C33DC5901307461");
@@ -97,6 +112,7 @@ public class CourseListFragment extends BaseFragment implements View.OnClickList
             mVideoInfo.setLiveId("9C211CAFB37E1E85");
             mVideoInfo.setRecordId("94C3C69E37642E1F");
             mVideoInfo.setViewerName("replay2");
+            remmoveMarquee();
             HDApi.get().switchVideo(mVideoInfo, HDApi.ApiType.REPLAY);
         } else if (id == R.id.id_replay_2) {
             mVideoInfo = new VideoInfo();
@@ -106,6 +122,7 @@ public class CourseListFragment extends BaseFragment implements View.OnClickList
             mVideoInfo.setRecordId("8B04FD894E08A94E");
             mVideoInfo.setViewerToken("123");
             mVideoInfo.setViewerName("replay2");
+            remmoveMarquee();
             HDApi.get().switchVideo(mVideoInfo, HDApi.ApiType.REPLAY);
         }
     }

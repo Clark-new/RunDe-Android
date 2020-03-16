@@ -206,7 +206,7 @@ public class LiveLoginActivity extends BaseActivity implements View.OnClickListe
                 // 缓存登陆的参数
                 writeSharePreference();
                 dismissPopupWindow();
-                VideoCourseActivity.go(LiveLoginActivity.this, true);
+                VideoCourseActivity.go(LiveLoginActivity.this, true,viewer.getMarquee());
             }
 
             @Override

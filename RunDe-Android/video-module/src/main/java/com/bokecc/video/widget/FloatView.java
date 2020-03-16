@@ -64,6 +64,10 @@ public class FloatView extends FrameLayout implements View.OnClickListener {
 
 
     public void addChildView(View view) {
+        if (view.getParent()!=null){
+            ViewGroup viewGroup = (ViewGroup) view.getParent();
+            viewGroup.removeView(view);
+        }
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);

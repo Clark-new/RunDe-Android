@@ -105,7 +105,7 @@ public class ChatFragment extends GiftFragment {
                     //所有条目,数量值
                     int totalItemCount = manager.getItemCount();
                     // 判断是否滚动到底部
-                    if (lastVisibleItem == (totalItemCount - 1)) {
+                    if (lastVisibleItem >= (totalItemCount - 1)) {
                         shouldAutoScroll = true;
                     }
                 } else {
