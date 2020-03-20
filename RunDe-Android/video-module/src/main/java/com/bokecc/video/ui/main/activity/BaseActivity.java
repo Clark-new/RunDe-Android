@@ -23,7 +23,7 @@ public class BaseActivity extends AppCompatActivity {
 
 //        if (ScreenAdapterUtil.hasNotchAtOPPO(this)) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().setStatusBarColor(0xff000000);
+//            getWindow().setStatusBarColor(0xff000000);
 //        }else{
 //            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        }

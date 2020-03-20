@@ -61,8 +61,10 @@ public class CourseListFragment extends BaseFragment implements View.OnClickList
         if (getActivity() instanceof VideoCourseActivity){
             VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
             if (videoCourseActivity.getVideoFragment()!=null){
-                videoCourseActivity.getVideoFragment().getmVideoView().removeMarquee();
-                videoCourseActivity.getVideoFragment().getmDocView().removeMarquee();
+                if (videoCourseActivity.getVideoFragment().getmVideoView()!=null)
+                    videoCourseActivity.getVideoFragment().getmVideoView().removeMarquee();
+                if (videoCourseActivity.getVideoFragment().getmDocView()!=null)
+                    videoCourseActivity.getVideoFragment().getmDocView().removeMarquee();
             }
         }
     }

@@ -96,7 +96,7 @@ public class FloatView extends FrameLayout implements View.OnClickListener {
         mParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_PANEL;
         // 设置图片格式，效果为背景透明
         mParams.format = PixelFormat.TRANSLUCENT;
-        mParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        mParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
         mParams.windowAnimations = R.style.FloatWindowAnimation;
         mParams.gravity = Gravity.START | Gravity.TOP; // 调整悬浮窗口至右下角
         // 设置悬浮窗口长宽数据
@@ -118,7 +118,7 @@ public class FloatView extends FrameLayout implements View.OnClickListener {
         }
         // 设置图片格式，效果为背景透明
         mParams.format = PixelFormat.TRANSLUCENT;
-        mParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        mParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN|WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
         mParams.windowAnimations = R.style.FloatWindowAnimation;
         mParams.gravity = Gravity.START | Gravity.TOP; // 调整悬浮窗口至右下角
         // 设置悬浮窗口长宽数据
