@@ -3,12 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <com.bokecc.video.widget.MaxVideoContainer
-        android:id="@+id/id_max_container"
+    <RelativeLayout
+        android:id="@+id/max_container_root"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000000" />
+        android:layout_height="wrap_content">
+        <com.bokecc.video.widget.MaxVideoContainer
+            android:id="@+id/id_max_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#000000" />
+        <com.bokecc.video.widget.MeasureLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/no_stream_root"
+            android:background="@drawable/live_nostart_bg"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            >
+            <ImageView
+                android:id="@+id/iv_no_stream"
+                android:layout_centerHorizontal="true"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/live_nostart_img"/>
+            <TextView
+                android:id="@+id/tv_no_stream"
+                android:layout_below="@+id/iv_no_stream"
+                android:layout_marginTop="20dp"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="直播未开始"
+                android:textSize="13sp"
+                android:textColor="#f5f5f5"/>
+
+        </com.bokecc.video.widget.MeasureLayout>
+    </RelativeLayout>
+
 
 
     <com.bokecc.video.widget.TabPageIndicator

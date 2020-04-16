@@ -3,6 +3,7 @@ package com.bokecc.video.ui.main.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -193,6 +194,7 @@ public class VideoCourseActivity extends ClickActionActivity {
             mPunchDialog.setTime(time);
             mPunchDialog.show(getSupportFragmentManager(), "mPunchDialog");
         } else if (action.getType() == PunchAction.Action.STOP_PUNCH) {
+            Log.e("###","stoppunch");
             if (mPunchDialog != null) {
                 mPunchDialog.dismiss();
             }

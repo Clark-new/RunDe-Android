@@ -1,5 +1,7 @@
 package com.bokecc.video.api;
 
+import android.util.Log;
+
 import com.bokecc.sdk.mobile.live.DWLive;
 import com.bokecc.sdk.mobile.live.DWLiveListener;
 import com.bokecc.sdk.mobile.live.Exception.DWLiveException;
@@ -23,6 +25,7 @@ import com.bokecc.sdk.mobile.live.pojo.SettingInfo;
 import com.bokecc.sdk.mobile.live.pojo.TeacherInfo;
 import com.bokecc.video.msg.AnnounceMsg;
 import com.bokecc.video.msg.BannedChatMsg;
+import com.bokecc.video.msg.StreamState;
 import com.bokecc.video.route.ChatMsgEntity;
 import com.bokecc.video.route.QuestionnaireMsg;
 import com.bokecc.video.route.StatusChangeMsg;
@@ -34,6 +37,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static com.bokecc.video.msg.StreamState.STREAM_END;
+import static com.bokecc.video.msg.StreamState.STREAM_NOT_START;
+import static com.bokecc.video.msg.StreamState.STREAM_START;
 
 public class LiveListener implements DWLiveListener {
 
@@ -51,6 +58,17 @@ public class LiveListener implements DWLiveListener {
 
     @Override
     public void onLiveStatus(DWLive.PlayStatus playStatus) {
+        switch (playStatus) {
+            case PLAYING:
+                // 直播正在播放
+                StreamState streamState = new StreamState();
+                streamState.status=STREAM_START;
+                CCEventBus.getDefault().post(streamState);
+                break;
+            default:
+                break;
+        }
+
     }
 
     @Override
@@ -59,6 +77,10 @@ public class LiveListener implements DWLiveListener {
         PunchAction action = new PunchAction();
         action.setType(PunchAction.Action.STOP_PUNCH);
         CCEventBus.getDefault().post(action);
+        //发送结束直播通知
+        StreamState streamState = new StreamState();
+        streamState.status=normal?STREAM_END:STREAM_NOT_START;
+        CCEventBus.getDefault().post(streamState);
     }
 
     @Override

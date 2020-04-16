@@ -157,17 +157,6 @@ public abstract class BaseVideoFragment extends BaseFragment implements HandleBa
         }
     }
 
-    // dds modify
-    protected void setInitTitleToNarrow() {
-        mOpenTitleState = NARROW_STATE;
-        int ret = Math.abs(mCourseTile.getHeight() - mNarrowHeight);
-        if (ret > 10) {
-            CommonUtils.setChangeHeightAnim(mCourseTile, mBroadHeight, mNarrowHeight, 300);
-            CommonUtils.setChangeWidthAnim(mFloatAnchorView, floatViewWidth, 0, 300);
-        }
-    }
-
-
     protected void setTitleToBroad() {
         if (mOpenTitleState == BROAD_STATE || isSpecialCourse) return;
         mOpenTitleState = BROAD_STATE;

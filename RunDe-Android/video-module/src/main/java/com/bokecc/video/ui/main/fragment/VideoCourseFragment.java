@@ -9,14 +9,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Build;
+import android.util.Log;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -24,10 +28,14 @@ import androidx.core.app.NotificationManagerCompat;
 import com.bokecc.sdk.mobile.live.eventbus.Subscribe;
 import com.bokecc.sdk.mobile.live.eventbus.ThreadMode;
 import com.bokecc.sdk.mobile.live.logging.ELog;
+import com.bokecc.sdk.mobile.live.pojo.Marquee;
+import com.bokecc.sdk.mobile.live.widget.DocView;
 import com.bokecc.video.R;
 import com.bokecc.video.api.HDApi;
 import com.bokecc.video.controller.OtherFunctionCallback;
 import com.bokecc.video.controller.StandardVideoController;
+import com.bokecc.video.msg.MarqueeAction;
+import com.bokecc.video.msg.StreamState;
 import com.bokecc.video.route.DanmuMessage;
 import com.bokecc.video.route.NotificationPlayMsg;
 import com.bokecc.video.route.NotificationReceiver;
@@ -39,7 +47,11 @@ import com.bokecc.video.video.HDVideoView;
 import com.bokecc.video.video.RTCController;
 import com.bokecc.video.widget.DocWebView;
 import com.bokecc.video.widget.FloatView;
+import com.bokecc.video.widget.MarqueeView;
 import com.bokecc.video.widget.MaxVideoContainer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.view.View.VISIBLE;
 import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
@@ -70,6 +82,8 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     private boolean isManualPause = false;
     private AudioManager mAudioManager;
     private boolean mFirstEnter = true;
+    private RelativeLayout mNoStreamBg;
+    private TextView tvNoStream;
 
     @Override
     protected void initData() {
@@ -82,6 +96,8 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     protected void initView() {
         super.initView();
         mMaxContainer = findViewById(R.id.id_max_container);
+        mNoStreamBg = findViewById(R.id.no_stream_root);
+        tvNoStream = findViewById(R.id.tv_no_stream);
         mVideoController = new StandardVideoController(getActivity());
         mVideoController.setOtherFunctionCallback(this);
         mVideoController.setRtcControlCallback(this);
@@ -175,10 +191,6 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
                 HDApi.get().setDocView(mDocView);
             } else {
                 mMaxContainer.addChildView(mVideoView);
-
-                //dds modify
-                setInitTitleToNarrow();
-
             }
         }
     }
@@ -225,25 +237,26 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             mFloatView.removeFromWindow();
         }
         mVideoController.pause();
-        if (mVideoView.isPlaying()) {
-            createNotification(courseTitle, R.drawable.icon_pause);
-        } else {
-            createNotification(courseTitle, R.drawable.icon_play);
+        if(mVideoView.isPlaying()){
+            createNotification(courseTitle,R.drawable.icon_pause);
+        }else{
+            createNotification(courseTitle,R.drawable.icon_play);
         }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (mVideoView != null)
-            mVideoView.videoDestroy();
-        if (mFloatView != null)
+        if (mVideoView!=null)
+        mVideoView.videoDestroy();
+        if (mFloatView!=null)
             mFloatView.removeFromWindow();
-        if (mVideoView != null)
-            mVideoView.release();
+        if (mVideoView!=null)
+        mVideoView.release();
         mVideoController.release();
         clearNotification();
     }
+
 
 
     @Override
@@ -257,7 +270,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
 
     @Override
     public void onSwapBtnClick(ImageView view) {
-        if (mFloatView == null) {
+        if(mFloatView==null){
             return;
         }
         if (!mFloatView.hasAddToWindow() && HDApi.get().hasDoc()) {
@@ -272,12 +285,12 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             mMaxContainer.addChildView(view1);
             mFloatView.addChildView(view2);
             //设置跑马灯
-            if (mVideoView != null && getActivity() instanceof VideoCourseActivity) {
+            if (mVideoView!=null&&getActivity() instanceof VideoCourseActivity){
                 VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
-                if (mVideoView != null)
-                    mVideoView.setMarquee(getActivity(), videoCourseActivity.getMarquee());
-                if (mDocView != null)
-                    mDocView.setMarquee(getActivity(), videoCourseActivity.getMarquee());
+                if (mVideoView!=null)
+                    mVideoView.setMarquee(getActivity(),videoCourseActivity.getMarquee());
+                if (mDocView!=null)
+                    mDocView.setMarquee(getActivity(),videoCourseActivity.getMarquee());
             }
         }
     }
@@ -309,6 +322,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onVideoSwitch(OnVideoSwitchMsg message) {
+        mNoStreamBg.setVisibility(View.GONE);
         if (message.getType() == OnVideoSwitchMsg.PREPARE) {
 
         } else if (message.getType() == OnVideoSwitchMsg.START) {
@@ -318,26 +332,50 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
         }
     }
 
+    /**
+     * 不同的课程发生切换的回调
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onStreamStatus(StreamState streamState) {
+        Log.e("###","onStreamStatus streamState ="+streamState.status);
+        switch (streamState.status){
+            case StreamState.STREAM_END:
+                mNoStreamBg.setVisibility(VISIBLE);
+                tvNoStream.setText("直播已结束");
+                break;
+            case StreamState.STREAM_START:
+                mNoStreamBg.setVisibility(View.GONE);
+                break;
+            case StreamState.STREAM_NOT_START:
+                mNoStreamBg.setVisibility(VISIBLE);
+                tvNoStream.setText("直播未开始");
+                break;
+        }
+
+
+
+    }
 
     /**
      * 接收到通知栏的暂停或者播放消息
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceiveNotificationPlayMsg(NotificationPlayMsg message) {
-        if (message.code == NotificationPlayMsg.PLAY_PAUSE) {
-            if (mVideoView.isPlaying()) {
+        if(message.code == NotificationPlayMsg.PLAY_PAUSE){
+            if(mVideoView.isPlaying()){
                 mVideoView.videoPause();
                 mVideoController.pause();
                 isManualPause = true;
-                createNotification(courseTitle, R.drawable.icon_play);
-            } else {
+                createNotification(courseTitle,R.drawable.icon_play);
+            }else{
                 mVideoView.videoStart();
                 mVideoController.resume();
                 isManualPause = false;
-                createNotification(courseTitle, R.drawable.icon_pause);
+                createNotification(courseTitle,R.drawable.icon_pause);
             }
         }
     }
+
 
 
     /**
@@ -368,32 +406,32 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             mMaxContainer.addChildView(mDocView);
             mFloatView.addChildView(mVideoView);
             HDApi.get().setDocView(mDocView);
-            //TODO:
-            if (mFloatView.hasAddToWindow()) {
-                mFloatView.updatePosition(anchorX, anchorY);
-            } else {
-                mFloatView.addToActivity(mRootView, anchorX, anchorY);
-            }
-            mFloatView.removeChildView();
-
         } else {
             mMaxContainer.removeChildView();
             if (mFloatView != null) {
-                mFloatView.removeAllViews();
+                mFloatView.removeChildView();
+                mFloatView.removeChildView();
                 mFloatView.removeFromWindow();
-                mFloatView = null;
             }
             mMaxContainer.addChildView(mVideoView);
         }
         mVideoView.videoStart();
+
+        //TODO:
+        if (mFloatView.hasAddToWindow()) {
+            mFloatView.updatePosition(anchorX, anchorY);
+        } else {
+            mFloatView.addToActivity(mRootView, anchorX, anchorY);
+        }
         mMaxContainer.removeChildView();
-        createNotification("这是当前课程标题", R.drawable.icon_pause);
+        mFloatView.removeChildView();
+        createNotification("这是当前课程标题",R.drawable.icon_pause);
         //重新获取跑马灯
-        if (mVideoView != null)
-            mVideoView.setMarquee(getActivity(), HDApi.get().getMarquee());
-        if (mDocView != null)
-            mDocView.setMarquee(getActivity(), HDApi.get().getMarquee());
-        if (getActivity() instanceof VideoCourseActivity) {
+        if (mVideoView!=null)
+            mVideoView.setMarquee(getActivity(),HDApi.get().getMarquee());
+        if(mDocView!=null)
+            mDocView.setMarquee(getActivity(),HDApi.get().getMarquee());
+        if (getActivity() instanceof VideoCourseActivity){
             VideoCourseActivity videoCourseActivity = (VideoCourseActivity) getActivity();
             videoCourseActivity.setMarquee(HDApi.get().getMarquee());
         }
@@ -514,10 +552,10 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (mFloatView != null)
+            if (mFloatView!=null)
                 mFloatView.updatePosition(0, 0);
         } else {
-            if (mFloatView != null)
+            if (mFloatView!=null)
                 mFloatView.updatePosition(anchorX, anchorY);
             setTitleToBroad();
         }
@@ -549,8 +587,8 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     /**
      * 创建并更新通知
      */
-    private void createNotification(String title, int playResId) {
-        if (getContext() == null) return;
+    private void createNotification(String title,int playResId){
+        if(getContext() == null) return;
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setComponent(new ComponentName(getContext(), VideoCourseActivity.class));
@@ -564,11 +602,11 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
 
         RemoteViews remoteViews = new RemoteViews(getContext().getPackageName(), R.layout.item_notification);
         remoteViews.setTextViewText(R.id.id_content, title);
-        remoteViews.setImageViewResource(R.id.id_play_btn, playResId);
-        if (HDApi.get().getApiType() == HDApi.ApiType.LIVE) {
-            remoteViews.setViewVisibility(R.id.id_last_one, View.GONE);
-            remoteViews.setViewVisibility(R.id.id_next_one, View.GONE);
-        } else {
+        remoteViews.setImageViewResource(R.id.id_play_btn,playResId);
+        if(HDApi.get().getApiType() == HDApi.ApiType.LIVE){
+            remoteViews.setViewVisibility(R.id.id_last_one,View.GONE);
+            remoteViews.setViewVisibility(R.id.id_next_one,View.GONE);
+        }else{
             remoteViews.setViewVisibility(R.id.id_last_one, VISIBLE);
             remoteViews.setViewVisibility(R.id.id_next_one, VISIBLE);
         }
@@ -616,7 +654,7 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
             //TODO：
             CharSequence name = "药店大学直播";
             String description = "description";
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name,  NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription(description);
             //锁屏显示通知
             channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
@@ -633,20 +671,20 @@ public class VideoCourseFragment extends RTCControlFragment implements OtherFunc
     private AudioManager.OnAudioFocusChangeListener mAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-            ELog.e("Sivin", "focusChange:" + focusChange);
-            switch (focusChange) {
-                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                case AudioManager.AUDIOFOCUS_LOSS:
-                    if (mFirstEnter) {
-                        mFirstEnter = false;
-                        return;
-                    }
-                    mVideoView.videoPause();
-                    mVideoController.pause();
-                    isManualPause = true;
-                    createNotification(courseTitle, R.drawable.icon_play);
+           ELog.e("Sivin","focusChange:"+focusChange);
+            switch (focusChange){
+               case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+               case AudioManager.AUDIOFOCUS_LOSS:
+                   if(mFirstEnter) {
+                       mFirstEnter = false;
+                       return;
+                   }
+                   mVideoView.videoPause();
+                   mVideoController.pause();
+                   isManualPause = true;
+                   createNotification(courseTitle,R.drawable.icon_play);
 
-            }
+           }
         }
     };
 
